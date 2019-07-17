@@ -1,10 +1,10 @@
 --[[--ldoc desc
-@module sort_text
+@module sortingAlgorithm
 @author JrueZhu
 
 Date   2019-07-10 10:32:54
 Last Modified by   JrueZhu
-Last Modified time 2019-07-17 14:32:39
+Last Modified time 2019-07-17 15:31:09
 ]]
 
 local function checktable(value)
