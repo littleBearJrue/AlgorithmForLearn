@@ -1,8 +1,10 @@
 -- @Author: Jrue
 -- @Date:   2019-07-17 23:15:05
--- @Last Modified by:   Jrue
--- @Last Modified time: 2019-07-18 23:11:16
+-- @Last Modified by   Jrue
+-- @Last Modified time 2019-08-02 18:27:29
 
+require "bit"
+local SortUtil = require(".sortingAlgorithm")
 
 function table.tostring(root)
     if not root then return end
@@ -105,10 +107,373 @@ function twoSums(data, target)
 	return result
 end
 
+-------------------------------------- 字符串相关算法 start----------------------------------------------------
+function string2Table(str)
+    local strTable = {}
+    for i = 1, string.len(str) do
+        local subStr = string.sub(str, i, i)
+        table.insert(strTable, subStr)
+    end
+    return strTable
+end
+
+function table2String(strTable)
+    local str = ""
+    for i = 1, #strTable do
+        str  = str .. strTable[i]
+    end
+    return str
+end
+
+--[[
+    字符串反转：
+    给定一个字符串，要求将字符串前面的若干字符移到字符串的尾部
+--]]
+function stringReverse(originStr, n)
+    local function shiftSubStr(str, from, to)
+        while(from < to) do
+            local temp = str[to]
+            str[to] = str[from]
+            str[from] = temp
+            from = from + 1
+            to = to - 1
+        end
+    end
+    local strTable = string2Table(originStr)
+    -- 先反转前一部分字符串
+    shiftSubStr(strTable, 1, n)
+    -- 在反转后一部分字符串
+    shiftSubStr(strTable, n + 1, #strTable)
+    -- 最后对整个字符串进行反转
+    shiftSubStr(strTable, 1, #strTable)
+
+    return table2String(strTable)
+end
+
+--[[
+    字符串的包含
+    给定一个长字符串a和短字符串b,判断出短字符串b中是否所有字符都在长字符串中
+    方法一： 排序后轮询（O(mlongm) + O(nlogn)）
+    方法二： 素数相乘 （O(m + n)）
+    方法三：位运算法（O(m + n)）
+    这里使用位运算法。也可以尝试使用hashmap的映射方式实现
+
+--]]
+function stringContain(originStr, targetStr)
+    local hash = 0
+    local originTable = string2Table(originStr)
+    local targetTable = string2Table(targetStr)
+    for i = 1, #originTable do
+        hash = bit.bor(hash, bit.lshift(1, string.byte(originTable[i]) - string.byte("A")))
+        print("1111:",string.byte(originTable[i]) - string.byte("A"))
+        print("2222:",bit.lshift(1, string.byte(originTable[i]) - string.byte("A")))
+        print("hash:", hash)
+    end
+    for j = 1, #targetTable do
+        if bit.band(hash, bit.lshift(1, string.byte(targetTable[j]) - string.byte("A"))) == 0 then
+            return false
+        end
+    end
+    return true
+end
+
+--[[
+    字符串全排列
+    输入一个字符串，打印出该字符串中字符的所有排列
+--]]
+function StringAllSort(originStr)
+    
+end
+
+
+--[[
+    字符串转化为整数输出
+--]]
+function StringToInt(originStr)
+    local originTable = string2Table(originStr)
+    if #originTable <= 0 then
+        return 0
+    end
+    local flag = 1
+    local result = 0
+    local beginIndex = 1
+    if originTable[1] == "-" then
+        flag = -1
+        beginIndex = 2
+    end
+    for i = beginIndex, #originTable do
+        if string.byte(originTable[i]) > string.byte("0") and string.byte(originTable[i]) < string.byte("9") then
+            result = result * 10 +  (string.byte(originTable[i]) - string.byte("0"))
+        end 
+        
+    end
+    return result * flag
+end
+
+--[[
+    字符串回文
+--]]
+function stringPalindrome(originStr)
+    local originTable = string2Table(originStr)
+    if #originTable <= 0 then
+        return false
+    end
+    local begin = 1
+    local last = #originTable
+    while(begin < last) do
+        if originTable[begin] == originTable[last] then
+            begin = begin + 1
+            last = last - 1
+        else
+            return false
+        end
+    end
+    return true
+end
+
+--[[
+    最长回文子串
+    方法一：中心拓展法：从中心向两边拓展，判断两边的数是否相等，记录相等时子串的总长度，这里要奇偶数回文字串
+    方法二：manacher算法： 在每个字符之间插入“#”,解决了要处理奇偶的问题，因为插入之后只能变成了变成了奇数。
+--]]
+function stringLongestPalindrome(originStr)
+    local originTable = string2Table(originStr)
+    local adjustTable = {}
+    for i = 1, #originTable do
+        table.insert(adjustTable, "#")
+        table.insert(adjustTable, originTable[i])
+    end
+    table.insert(adjustTable, "#")
+
+    local RL = {}       -- 记录每个index下回文字符串的长度
+    local right = -1    -- 当前回文的右边界
+    local center = -1   -- 当前回文的中心
+    local max = -1      -- 当前回文的最大值
+
+    for i = 1, #adjustTable do
+        if right > i then
+            RL[i] = math.min(RL[2 * center - i], right - i)
+        else
+            RL[i] = 1
+        end
+
+        while(i - RL[i] > 0 and i + RL[i] < #adjustTable) do
+            if (adjustTable[i - RL[i]] == adjustTable[i + RL[i]]) then
+                RL[i] = RL[i] + 1
+            else
+                break
+            end
+        end
+
+        if i + RL[i] > right then
+            right = i + RL[i]
+            center = i
+        end
+        max = math.max(max, RL[i])
+    end
+    return max - 1
+end
+
+-------------------------------------- 字符串相关算法 end----------------------------------------------------
+
+
+-------------------------------------- 数组相关算法 start----------------------------------------------------
+
+function swap(data, a, b)
+    data[a] = data[a] + data[b]
+    data[b] = data[a] - data[b]
+    data[a] = data[a] - data[b]
+end
+
+
+--[[
+    寻找最小的k个数
+    1. 快速排序，从小到大筛选
+    2. 部分排序，再筛选
+    3. 用最小堆的方式来寻找(适用于海量数据，从磁盘硬盘中读取数据部分数据，在进行最小堆操作)
+    4. 使用平均复杂度为O(n)的快速排序算法
+--]]
+function findLastestNumWithHeap(data, k)
+    local function buildMinHeap(arr, headNodePos, size)
+        if headNodePos < size then
+            local leftChildNodePos = 2 * headNodePos
+            local rightChildNodePos = 2 * headNodePos + 1
+            local minPos = headNodePos
+
+            if leftChildNodePos < size and arr[leftChildNodePos] < arr[minPos] then
+                minPos = leftChildNodePos
+            end
+
+            if rightChildNodePos < size and arr[rightChildNodePos] < arr[minPos] then
+                minPos = rightChildNodePos
+            end
+
+            if minPos ~= headNodePos then
+                swap(arr, headNodePos, minPos)
+
+                buildMinHeap(arr, minPos, size)
+            end
+        end
+    end
+
+        local function buildMaxHeap(arr, headNodePos, size)
+        if headNodePos < size then
+            -- 找到左子节点的位置(因为lua语法是从index 1开始算起的，正常的左子节点为 2*x+1)
+            local leftNodePos = 2 * headNodePos
+            -- 找到右子节点的位置(因为lua语法是从index 1开始算起的，正常的右子节点为 2*x+2)
+            local rightNodePos = 2 * headNodePos + 1
+            -- 先把当前头节点位置当做是最大值所在位置
+            local maxPos = headNodePos
+            
+            -- 判断左子节点的位置是否大于最大值，则更新最大值所在位置
+            if leftNodePos < size and arr[leftNodePos] > arr[maxPos] then
+                maxPos = leftNodePos
+            end
+
+            -- 判断右子节点的位置是否大于最大值，则更新最大值所在位置
+            if rightNodePos < size and arr[rightNodePos] > arr[maxPos] then
+                maxPos = rightNodePos
+            end
+
+            -- 假如当前的头节点不是最大值所在位置，则需要交换彼此的位置
+            if maxPos ~= headNodePos then
+
+                swap(arr, headNodePos, maxPos)
+            
+                -- 继续比较建堆
+                buildMaxHeap(arr, maxPos, size)
+            end 
+        end
+    end
+
+    if data == nil or #data == 1 or #data == 2 then
+        return {}
+    end
+
+    for i =  math.floor(k / 2), 1, -1 do
+        buildMaxHeap(data, i, k)
+    end
+
+    for i = k + 1, #data do
+        print("data[i]: ", data[i])
+        print("data[1]: ", data[1])
+        if data[i] < data[1] then
+            swap(data, 1, i)
+        
+            buildMaxHeap(data, 1, k)
+        end
+    end
+    return data
+end
+
+function findTwoSums(data, targetNum)
+
+    SortUtil.quickSort(data, 1, #data)
+    print("data: ",data) 
+    local beginIndex = 1
+    local endIndex = #data
+    while(beginIndex < endIndex) do
+        local twoSums = data[beginIndex] + data[endIndex]
+        if twoSums  == targetNum then
+            break
+        else
+            if twoSums > targetNum then
+                endIndex = endIndex - 1
+            else
+                beginIndex = beginIndex + 1
+            end
+        end
+    end
+    print("111111111: ", beginIndex, endIndex)
+    return {data[beginIndex], data[endIndex]} 
+end
+
+
+-------------------------------------- 数组相关算法 end----------------------------------------------------
+
+-------------------------------------- 屌屌的算法 start----------------------------------------------------
+--[[
+    约瑟夫环问题：
+    编号为 1-N 的 N 个士兵围坐在一起形成一个圆圈，从编号为 1 的士兵开始依次报数（1，2，3...这样依次报），
+    数到 m 的 士兵会被杀死出列，之后的士兵再从 1 开始报数。直到最后剩下一士兵，求这个士兵的编号
+    1. 使用数组实现，将选中的位置value值置为-1
+    2. 使用循环链表实现，将选中的位置节点删除
+    3. 使用递归的方式实现,循环条件为old = (new + m - 1) % n + 1
+    这里使用递归的方式实现
+--]]
+function  josephRing(totalNum, targetNum)
+    if totalNum == 1 then
+        return totalNum
+    end
+    return (josephRing(totalNum - 1, targetNum) + targetNum - 1) % totalNum + 1
+end
+
+--[[
+    实现算术加法：1+2+3+4+...+n
+    不能使用乘除法，for while if switch case等关键字和判断条件，如三元
+--]]
+-- function specialAdd(totalNum)
+--     local sum = totalNum
+--     -- lua语言没法模拟三元运算符
+--     local t = (sum ~= 0 and (sum += specialAdd(totalNum - 1)) ~= 0)
+--     return sum
+-- end
+
+
+--[[
+    通过位运算实现算术相加
+     a + b = a ^ b + (a & b) << 1
+      a ^ b ： 实现不算进位的相加
+      (a & b) << 1： 实现需要进位的相加
+--]]
+function specialTwoNumsAdd(num1, num2)
+    local temp = 0
+    while(num1 ~= 0) do
+        print("num1-num2:", num1, num2)
+        temp = bit.bxor(num1, num2)
+        print("temp:", temp)
+        num1 = bit.lshift(bit.band(num1, num2), 1)
+        print("num1:", num1)
+        num2 = temp
+        print("num2:", num2)
+    end
+    return num2
+end
+
+--[[
+    实现算术相乘的算法
+--]]
+function specialMult(num1, num2)
+    if num1 == 0 or num2 == 0 then
+        return 0
+    end
+    if num1 == 1 then
+        return num2
+    end
+    if num2 == 1 then
+        return num1
+    end
+    return num1 + specialMult(num1, num2 - 1)
+
+end
+
+-------------------------------------- 屌屌的算法 end----------------------------------------------------
+
+
 function main()
-	-- local resultData = countNum(5)
-	local resultData = twoSums({2, 7,11,15, 1, 8, 3, 6}, 9)
-	print("输出结果：", table.tostring(resultData))
+	-- -- local resultData = countNum(5)
+	-- local resultData = twoSums({2, 7,11,15, 1, 8, 3, 6}, 9)
+    -- local resultData = stringContain("abcd", "aba")
+	-- local resultData = StringToInt("-1234")
+    -- local resultData = stringPalindrome("abcacba")
+    -- local resultData = stringLongestPalindrome("abcdeedcba")
+    -- local resultData = josephRing(12, 6)
+    -- local resultData = specialTwoNumsAdd(5, 1)
+    -- local resultData = specialMult(2,4)
+    -- local resultData = findLastestNumWithHeap({2,10,1,44,6,3,7,8,3,11,6,9}, 5)
+    local resultData = findTwoSums({2, 7,11,15, 1, 8, 3, 6}, 9)
+    print("输出结果：", table.tostring(resultData))
+
 end
 
 main()

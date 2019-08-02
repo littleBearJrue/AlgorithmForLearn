@@ -3,8 +3,8 @@
 @author JrueZhu
 
 Date   2019-07-10 10:32:54
-Last Modified by   JrueZhu
-Last Modified time 2019-07-17 15:31:09
+Last Modified by   Jrue
+Last Modified time 2019-08-02 18:06:34
 ]]
 
 local function checktable(value)
@@ -265,8 +265,8 @@ function quickSort(data, low, high)
 
 	if low < high then
 		local partitionIndex = partition(data, low, high)
-		quickSort(data, low, partitionIndex - 1)
-		quickSort(data, partitionIndex + 1, high)
+		-- quickSort(data, low, partitionIndex - 1)
+		-- quickSort(data, partitionIndex + 1, high)
 	end
 end
 
@@ -308,6 +308,36 @@ function heapSort(data)
 		end
 	end
 
+	local function buildMinHeap(arr, headNodePos, size)
+		if headNodePos < size then
+			-- 找到左子节点的位置(因为lua语法是从index 1开始算起的，正常的左子节点为 2*x+1)
+			local leftNodePos = 2 * headNodePos
+			-- 找到右子节点的位置(因为lua语法是从index 1开始算起的，正常的右子节点为 2*x+2)
+			local rightNodePos = 2 * headNodePos + 1
+			-- 先把当前头节点位置当做是最大值所在位置
+			local minPos = headNodePos
+			
+			-- 判断左子节点的位置是否大于最大值，则更新最大值所在位置
+			if leftNodePos < size and arr[leftNodePos] < arr[minPos] then
+				minPos = leftNodePos
+			end
+
+			-- 判断右子节点的位置是否大于最大值，则更新最大值所在位置
+			if rightNodePos < size and arr[rightNodePos] < arr[minPos] then
+				minPos = rightNodePos
+			end
+
+			-- 假如当前的头节点不是最大值所在位置，则需要交换彼此的位置
+			if minPos ~= headNodePos then
+
+				swap(arr, headNodePos, minPos)
+			
+				-- 继续比较建堆
+				buildMinHeap(arr, minPos, size)
+			end 
+		end
+	end
+
 
 	if data == nil or table.nums(data) == 1 or table.nums(data) == 2 then
 		return
@@ -320,7 +350,10 @@ function heapSort(data)
 	-- 这里通过math.floor(size / 2)找到最后一个非叶子节点的位置，从后往前遍历取构建最大堆
 	for i = math.floor(size / 2), 1, -1 do
 		buildMaxHeap(data, i, size)
+		-- buildMinHeap(data, i, size)
 	end
+
+	print("1111111111: ", table.tostring(data))
 
 	for i = table.nums(data), 2, -1 do
 		
@@ -328,22 +361,33 @@ function heapSort(data)
 		swap(data, 1, i)
 
 		buildMaxHeap(data, 1, i)
+		-- buildMinHeap(data, 1, i)
 	end
 end
 
 
 function main()
-	local data = table.clone(originData)
-	printSortedResult(data, 0)
+	-- local data = table.clone(originData)
+	-- printSortedResult(data, 0)
 	-- bubbleSort(data)
 	-- SelectionSort(data)
 	-- insertSort(data)
 	-- shellSort(data)
 	-- data = mergeSort(data)
 	-- quickSort(data, 1, table.nums(data))
-	heapSort(data)
-	printSortedResult(data, 1)
+	-- heapSort(data)
+	-- printSortedResult(data, 1)
 end
 
 main()
+
+return {
+	bubbleSort = bubbleSort,
+	SelectionSort = SelectionSort,
+	insertSort = insertSort,
+	shellSort = shellSort,
+	mergeSort = mergeSort,
+	quickSort = quickSort,
+	heapSort = heapSort,
+}
 
