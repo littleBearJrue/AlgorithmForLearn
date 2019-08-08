@@ -1,7 +1,7 @@
 -- @Author: Jrue
 -- @Date:   2019-07-17 23:15:05
 -- @Last Modified by   Jrue
--- @Last Modified time 2019-08-02 18:27:29
+-- @Last Modified time 2019-08-07 18:07:02
 
 require "bit"
 local SortUtil = require(".sortingAlgorithm")
@@ -350,6 +350,7 @@ function findLastestNumWithHeap(data, k)
         return {}
     end
 
+    -- math.floor(k / 2) 最尾父节点
     for i =  math.floor(k / 2), 1, -1 do
         buildMaxHeap(data, i, k)
     end
@@ -366,8 +367,13 @@ function findLastestNumWithHeap(data, k)
     return data
 end
 
+--[[
+    找出数组中最大的两个数之和：
+    先快速排序，时间复杂度为O(nlogn)
+    再进行前后指针扫描，找到目标值，时间复杂度为O(n)
+    总共为O(nlogn + n) = O(nlogn)
+--]]
 function findTwoSums(data, targetNum)
-
     SortUtil.quickSort(data, 1, #data)
     print("data: ",data) 
     local beginIndex = 1
@@ -388,8 +394,85 @@ function findTwoSums(data, targetNum)
     return {data[beginIndex], data[endIndex]} 
 end
 
+--[[
+    最大连续子数组之和
+    时间复杂度为O(n)
+--]]
+function findMaxSubArray(data)
+    local size = #data
+    local curSum = 0
+    local maxSum = data[1]
+    for i = 1, #data do
+        if curSum > 0 then
+            curSum = curSum + data[i]
+        else
+            curSum = data[i]
+        end
+
+        if curSum > maxSum then
+            maxSum = curSum
+        end
+    end
+    return maxSum
+end
+
+--[[
+    奇偶数排序：给定一个数组，调整数组中的顺序，使得所有奇数位于数组的前半部分，偶数位于数组的后半部分。时间复杂度为O(n)
+    这里想到了快速排序方法，只是找找大小值变成了找奇偶数
+--]]
+function oddEvenSort(data)
+    local function isOddNum(value)
+        return value % 2 == 0
+    end
+    local beginIndex = 1
+    local endIndex = #data
+    while(beginIndex < endIndex) do
+        if isOddNum(data[beginIndex]) then
+            beginIndex = beginIndex + 1
+        elseif not isOddNum(data[endIndex]) then
+            endIndex = endIndex - 1
+        else
+            swap(data, endIndex, beginIndex)
+        end
+    end
+    return data
+end
+
+--[[
+    荷兰国旗算法
+    现有n个红白蓝三种不同颜色的小球乱序排列，请通过两两交换的方式实现从左到右排列为红球，白球，蓝球。
+    其中0：红球   1：白球   2：蓝球
+--]]
+function arrayColorSort(data)
+    local beginIndex = 1
+    local currentIndex = 1
+    local endIndex = #data
+    while(currentIndex < endIndex) do
+        if data[currentIndex] == 0 then
+            swap(data, currentIndex, beginIndex)
+            currentIndex = currentIndex + 1
+            beginIndex = beginIndex + 1
+        elseif data[currentIndex] == 1 then
+            currentIndex = currentIndex + 1
+        elseif data[currentIndex] == 2 then
+            swap(data, currentIndex, endIndex)
+
+            endIndex = endIndex - 1
+        end
+    end
+    return data
+end
+
 
 -------------------------------------- 数组相关算法 end----------------------------------------------------
+
+
+
+---------------------------------------- 树相关算法 start--------------------------------------------------
+
+
+
+---------------------------------------- 树相关算法 end----------------------------------------------------
 
 -------------------------------------- 屌屌的算法 start----------------------------------------------------
 --[[
@@ -406,6 +489,16 @@ function  josephRing(totalNum, targetNum)
         return totalNum
     end
     return (josephRing(totalNum - 1, targetNum) + targetNum - 1) % totalNum + 1
+end
+
+--[[
+    洗牌算法
+--]]
+function shuffle(data)
+    for i = #data, 2, -1 do
+        swap(data, i, math.random(1, i - 1))
+    end
+    return data
 end
 
 --[[
@@ -471,7 +564,11 @@ function main()
     -- local resultData = specialTwoNumsAdd(5, 1)
     -- local resultData = specialMult(2,4)
     -- local resultData = findLastestNumWithHeap({2,10,1,44,6,3,7,8,3,11,6,9}, 5)
-    local resultData = findTwoSums({2, 7,11,15, 1, 8, 3, 6}, 9)
+    -- local resultData = findTwoSums({2, 7,11,15, 1, 8, 3, 6}, 9)
+    -- local resultData = findMaxSubArray({1, -2, 3, 10, -4, 7, 2, -5})
+    -- local resultData = oddEvenSort({2, 7,11,15, 1, 8, 3, 6, 8, 63})
+    -- local resultData = arrayColorSort({0, 1, 2, 1, 1, 2, 0, 2, 1, 0})
+    local resultData = shuffle({1, 2, 3, 4, 5, 6, 7, 8, 9})
     print("输出结果：", table.tostring(resultData))
 
 end
