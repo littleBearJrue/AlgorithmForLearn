@@ -1,7 +1,7 @@
 -- @Author: Jrue
 -- @Date:   2019-07-17 23:15:05
 -- @Last Modified by   Jrue
--- @Last Modified time 2019-08-07 18:07:02
+-- @Last Modified time 2019-08-12 16:10:23
 
 require "bit"
 local SortUtil = require(".sortingAlgorithm")
@@ -463,6 +463,47 @@ function arrayColorSort(data)
     return data
 end
 
+--[[
+    给定一个有序的数组，查找某个数是否存在在这数组中
+    （典型的二分查找）
+--]]
+function BinarySearch(data, targetValue)
+    local left = 1
+    local right = #data
+    while(left <= right) do
+        local middle = left + bit.rshift(right - left, 1)
+        if data[middle] > targetValue then
+            right = middle - 1
+        elseif data[middle] < targetValue then
+            left = middle + 1
+        else
+            return true
+        end
+    end
+    return false
+end
+
+--[[
+    计算最大/最小连续乘积值 时间复杂度O(n)
+--]]
+function findMaxAndMinMultipleArray(data)
+    local maxEnd = data[1]
+    local minEnd = data[1]
+    local maxResult = data[1]
+    local minResult = data[1]
+    for i = 2, #data do
+        local curVaule1 = maxEnd * data[i]
+        local curValue2 = minEnd * data[i]
+        maxEnd = math.max(math.max(curVaule1, curValue2), data[i])
+        minEnd = math.min(math.min(curVaule1, curValue2), data[i])
+
+        maxResult = math.max(maxResult, maxEnd)
+        minResult = math.min(minResult, minEnd)
+    end
+    return {maxResult, minResult}
+end
+
+
 
 -------------------------------------- 数组相关算法 end----------------------------------------------------
 
@@ -552,6 +593,30 @@ end
 
 -------------------------------------- 屌屌的算法 end----------------------------------------------------
 
+---------------------------------------- 查找相关算法 start----------------------------------------------
+--[[
+    找出数组中出现次数超过一半的数
+    1. 对数组进行排序，既然是次数超过一半的数，那n/2肯定就是那个数了 O(nLogn + n)
+    2. 散列表 O(n)
+    3. 通过每次删除不同的数，最终留下来的数就是想要的 O(n)
+--]]
+function findHalfOfAppearWithDel(data)
+    for i = #data, 1, -1 do
+        if data[i - 1] and data[i] ~= data[i - 1] then
+            table.remove(data, i)
+            table.remove(data, i - 1)
+            i = i - 2
+        end
+    end
+    if data and #data > 0 then
+        return data[1]
+    end
+    return -1
+end
+
+
+---------------------------------------- 查找相关算法 end------------------------------------------------
+
 
 function main()
 	-- -- local resultData = countNum(5)
@@ -568,8 +633,12 @@ function main()
     -- local resultData = findMaxSubArray({1, -2, 3, 10, -4, 7, 2, -5})
     -- local resultData = oddEvenSort({2, 7,11,15, 1, 8, 3, 6, 8, 63})
     -- local resultData = arrayColorSort({0, 1, 2, 1, 1, 2, 0, 2, 1, 0})
-    local resultData = shuffle({1, 2, 3, 4, 5, 6, 7, 8, 9})
+    -- local resultData = shuffle({1, 2, 3, 4, 5, 6, 7, 8, 9})
+    -- local resultData = BinarySearch({2, 7,11,15, 1, 8, 3, 6, 8, 63}, 63)
+    -- local resultData = findHalfOfAppearWithDel({1, 2, 3, 1, 4, 1,5, 1, 1, 1, 1, 5,1,1})
+    local resultData = findMaxAndMinMultipleArray({2,4,5,-8,9,3,1,0,5,6,-7})
     print("输出结果：", table.tostring(resultData))
+     -- print("输出结果：", resultData)
 
 end
 
