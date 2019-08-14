@@ -4,7 +4,7 @@
 
 Date   2019-08-14 14:17:10
 Last Modified by   Jrue
-Last Modified time 2019-08-14 16:10:39
+Last Modified time 2019-08-14 18:34:08
 ]]
 function table.tostring(root)
     if not root then return end
@@ -83,9 +83,17 @@ function table.swap(data, a, b)
 	data[a] = data[a] - data[b]
 end
 
+function table.keyof(hashtable, value)
+    for k, v in pairs(hashtable) do
+        if v == value then return k end
+    end
+    return nil
+end
+
 return {
 	tostring = table.tostring,
 	nums = table.nums,
 	clone = table.clone,
 	swap = table.swap,
+	keyof = table.keyof,
 }

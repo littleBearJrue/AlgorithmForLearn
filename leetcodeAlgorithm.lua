@@ -1,11 +1,11 @@
 -- @Author: Jrue
 -- @Date:   2019-07-17 23:15:05
 -- @Last Modified by   Jrue
--- @Last Modified time 2019-08-14 16:11:45
+-- @Last Modified time 2019-08-14 17:36:11
 
 require "bit"
 local SortUtil = require(".sortingAlgorithm")
-local table = require(".tableUtils")
+local tableUtil = require(".tableUtils")
 
 
 --[[
@@ -593,7 +593,7 @@ function main()
     -- local resultData = BinarySearch({2, 7,11,15, 1, 8, 3, 6, 8, 63}, 63)
     -- local resultData = findHalfOfAppearWithDel({1, 2, 3, 1, 4, 1,5, 1, 1, 1, 1, 5,1,1})
     -- local resultData = findMaxAndMinMultipleArray({2,4,5,-8,9,3,1,0,5,6,-7})
-    print("输出结果：", table.tostring(resultData))
+    print("输出结果：", tableUtile.tostring(resultData))
      -- print("输出结果：", resultData)
 
 end

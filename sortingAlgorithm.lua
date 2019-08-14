@@ -4,10 +4,10 @@
 
 Date   2019-07-10 10:32:54
 Last Modified by   Jrue
-Last Modified time 2019-08-14 16:40:18
+Last Modified time 2019-08-14 17:19:04
 ]]
 
-local table = require(".tableUtils")
+local tableUtil = require(".tableUtils")
 
 local function checktable(value)
     if type(value) ~= "table" then value = {} end
@@ -40,9 +40,9 @@ local originData = {10,1,25,64,69,32,56,98,21,53}
 
 function printSortedResult(sortedData, type)
 	if type == 0 then
-		print("排序前的结果： ", table.tostring(sortedData))
+		print("排序前的结果： ", tableUtil.tostring(sortedData))
 	elseif type == 1 then
-		print("排序后的结果： ", table.tostring(sortedData))
+		print("排序后的结果： ", tableUtil.tostring(sortedData))
 	end
 	
 end
@@ -53,11 +53,11 @@ end
 --]]
 
 function bubbleSort(data)
-	for i = 1, table.nums(data) - 1 do
+	for i = 1, tableUtil.nums(data) - 1 do
 		local flag = true
-		for j = 1, table.nums(data) - i do
+		for j = 1, tableUtil.nums(data) - i do
 			if data[j] > data[j + 1] then
-				table.swap(data, j, j + 1)
+				tableUtil.swap(data, j, j + 1)
 				flag = false
 			end
 		end
@@ -73,14 +73,14 @@ end
 	选择排序：从未排序序列中找到最小的元素，将其放到排序序列的起始位置。继续找未排序序列的最小元素，将其放置排序序列的第二个位置...
 --]]
 function SelectionSort(data)
-	for i = 1, table.nums(data) - 1 do   -- 总共只需要进行N+1次比较
+	for i = 1, tableUtil.nums(data) - 1 do   -- 总共只需要进行N+1次比较
 		local minIndex = i
-		for j = i + 1, table.nums(data) do
+		for j = i + 1, tableUtil.nums(data) do
 			if data[j] < data[minIndex] then
 				minIndex = j
 			end
 		end
-		table.swap(data, i, minIndex)
+		tableUtil.swap(data, i, minIndex)
 	end
 end
 
@@ -88,10 +88,10 @@ end
 	插入排序：依次读取未排序序列，将元素插入到已排序序列中对应的位置中
 --]]
 function insertSort(data)
-	for i = 2, table.nums(data) do
+	for i = 2, tableUtil.nums(data) do
 		for j = i, 2, -1 do
 			if data[j] < data[j - 1] then
-				table.swap(data, j, j - 1)
+				tableUtil.swap(data, j, j - 1)
 			else
 				break
 			end
@@ -104,13 +104,13 @@ end
 --]]
 function shellSort(data)
 	local gap = 1
-	while(gap < table.nums(data)) do
+	while(gap < tableUtil.nums(data)) do
 		gap = gap * 3 + 1
 	end
 
 	while(gap > 0) do
 		print("gap--->", gap)
-		for i = gap, table.nums(data) do
+		for i = gap, tableUtil.nums(data) do
 			local tmp = data[i]
 			print("i--->" , i)
 			print("temp--->" , tmp)
@@ -135,7 +135,7 @@ function mergeSort(data)
 
 	local function merge(leftData, rightData)
 		local mergeData = {}
-		while(table.nums(leftData) > 0 and table.nums(rightData) > 0) do
+		while(tableUtil.nums(leftData) > 0 and tableUtil.nums(rightData) > 0) do
 			if leftData[1] <= rightData[1] then
 				table.insert(mergeData, leftData[1])
 				table.remove(leftData, 1)
@@ -145,12 +145,12 @@ function mergeSort(data)
 			end
 		end
 
-		while(table.nums(leftData) > 0) do
+		while(tableUtil.nums(leftData) > 0) do
 			table.insert(mergeData, leftData[1])
 			table.remove(leftData, 1)
 		end
 
-		while(table.nums(rightData) > 0) do
+		while(tableUtil.nums(rightData) > 0) do
 			table.insert(mergeData, rightData[1])
 			table.remove(rightData, 1)
 		end
@@ -158,11 +158,11 @@ function mergeSort(data)
 		return mergeData
 	end
 
-	if table.nums(data) < 2 then
+	if tableUtil.nums(data) < 2 then
 		return data
 	end
 
-	local middle = math.floor(table.nums(data)/2)
+	local middle = math.floor(tableUtil.nums(data)/2)
 	local leftArr, rightArr = table.split(data, middle)
 
 	return merge(mergeSort(leftArr), mergeSort(rightArr))
@@ -234,7 +234,7 @@ function heapSort(data)
 			-- 假如当前的头节点不是最大值所在位置，则需要交换彼此的位置
 			if maxPos ~= headNodePos then
 
-				table.swap(arr, headNodePos, maxPos)
+				tableUtil.swap(arr, headNodePos, maxPos)
 			
 				-- 继续比较建堆
 				buildMaxHeap(arr, maxPos, size)
@@ -264,7 +264,7 @@ function heapSort(data)
 			-- 假如当前的头节点不是最大值所在位置，则需要交换彼此的位置
 			if minPos ~= headNodePos then
 
-				table.swap(arr, headNodePos, minPos)
+				tableUtil.swap(arr, headNodePos, minPos)
 			
 				-- 继续比较建堆
 				buildMinHeap(arr, minPos, size)
@@ -273,26 +273,26 @@ function heapSort(data)
 	end
 
 
-	if data == nil or table.nums(data) == 1 or table.nums(data) == 2 then
+	if data == nil or tableUtil.nums(data) == 1 or tableUtil.nums(data) == 2 then
 		return
 	end
 
 
 
 	-- 建最大堆(目前根节点已经是数组中的最大值了)
-	local size = table.nums(data)
+	local size = tableUtil.nums(data)
 	-- 这里通过math.floor(size / 2)找到最后一个非叶子节点的位置，从后往前遍历取构建最大堆
 	for i = math.floor(size / 2), 1, -1 do
 		buildMaxHeap(data, i, size)
 		-- buildMinHeap(data, i, size)
 	end
 
-	print("1111111111: ", table.tostring(data))
+	print("1111111111: ", tableUtil.tostring(data))
 
-	for i = table.nums(data), 2, -1 do
+	for i = tableUtil.nums(data), 2, -1 do
 		
 		-- 每次都将建好的堆的根节点(最大值)与堆的最后一个元素进行交换，再继续建堆，再交换。。。
-		table.swap(data, 1, i)
+		tableUtil.swap(data, 1, i)
 
 		buildMaxHeap(data, 1, i)
 		-- buildMinHeap(data, 1, i)
@@ -301,16 +301,16 @@ end
 
 
 function main()
-	-- local data = table.clone(originData)
+	local data = tableUtil.clone(originData)
 	-- printSortedResult(data, 0)
 	-- bubbleSort(data)
 	-- SelectionSort(data)
 	-- insertSort(data)
 	-- shellSort(data)
-	-- data = mergeSort(data)
-	-- quickSort(data, 1, table.nums(data))
+	data = mergeSort(data)
+	-- quickSort(data, 1, tableUtil.nums(data))
 	-- heapSort(data)
-	-- printSortedResult(data, 1)
+	printSortedResult(data, 1)
 end
 
 main()
