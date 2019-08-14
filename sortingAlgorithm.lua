@@ -4,40 +4,16 @@
 
 Date   2019-07-10 10:32:54
 Last Modified by   Jrue
-Last Modified time 2019-08-02 18:06:34
+Last Modified time 2019-08-14 16:40:18
 ]]
+
+local table = require(".tableUtils")
 
 local function checktable(value)
     if type(value) ~= "table" then value = {} end
     return value
 end
 
-function table.nums(t)
-    local temp = checktable(t)
-    local count = 0
-    for k, v in pairs(temp) do
-        count = count + 1
-    end
-    return count
-end
-
-function table.clone(object)
-    local lookup_table = {}
-    local function _copy(object)
-        if type(object) ~= "table" then
-            return object
-        elseif lookup_table[object] then
-            return lookup_table[object]
-        end
-        local new_table = {}
-        lookup_table[object] = new_table
-        for key, value in pairs(object) do
-            new_table[_copy(key)] = _copy(value)
-        end
-        return setmetatable(new_table, getmetatable(object))
-    end
-    return _copy(object)
-end
 
 function table.split(data, splitIndex)
 	local leftArr = {}
@@ -54,55 +30,13 @@ function table.split(data, splitIndex)
 	return leftArr, rightArr
 end
 
-function table.tostring(root)
-    if not root then return end
-    local cache = {  [root] = "root" }
-    local flag = {};
-    local function _dump(t,name)
-        local mt = getmetatable(t)
-        if mt and mt.__tostring then
-            return tostring(t)
-        end
-        local temp = {}
-        for i,v in ipairs(t) do
-            flag[i] = true;
-            if cache[v] then
-                table.insert(temp, cache[v])
-            elseif type(v) == "table" then
-                cache[v] = string.format("%s[%d]", name, i)
-                table.insert(temp, string.format("%s", _dump(v, cache[v])))
-            else
-                table.insert(temp, tostring(v))
-            end
-        end
-        for k,v in pairs(t) do
-            if not flag[k] then
-                local key = tostring(k)
-                if cache[v] then
-                    table.insert(temp, string.format("%s=%s", key, cache[v]))
-                elseif type(v) == "table" then
-                    cache[v] = string.format("%s.%s", name, key)
-                    table.insert(temp, string.format("%s=%s", key, _dump(v, cache[v])))
-                else
-                    table.insert(temp, string.format("%s=%s", key, tostring(v)))
-                end
-            end
-        end
-        return string.format("{%s}", table.concat(temp,","));
-    end
-    return _dump(root, "root");
-end
+
 
 -- 原始数据
 -- local originData = {10,1,25,64,69,32,56,98,21,53,75,86,34,67,13,65,24,76,32,88,11,43,56,22,59,2,7,9,11,65,87,41,14,64,84,33,40,80,77,66}
 
 local originData = {10,1,25,64,69,32,56,98,21,53}
 
-function swap(data, a, b)
-	data[a] = data[a] + data[b]
-	data[b] = data[a] - data[b]
-	data[a] = data[a] - data[b]
-end
 
 function printSortedResult(sortedData, type)
 	if type == 0 then
@@ -123,7 +57,7 @@ function bubbleSort(data)
 		local flag = true
 		for j = 1, table.nums(data) - i do
 			if data[j] > data[j + 1] then
-				swap(data, j, j + 1)
+				table.swap(data, j, j + 1)
 				flag = false
 			end
 		end
@@ -146,7 +80,7 @@ function SelectionSort(data)
 				minIndex = j
 			end
 		end
-		swap(data, i, minIndex)
+		table.swap(data, i, minIndex)
 	end
 end
 
@@ -157,7 +91,7 @@ function insertSort(data)
 	for i = 2, table.nums(data) do
 		for j = i, 2, -1 do
 			if data[j] < data[j - 1] then
-				swap(data, j, j - 1)
+				table.swap(data, j, j - 1)
 			else
 				break
 			end
@@ -300,7 +234,7 @@ function heapSort(data)
 			-- 假如当前的头节点不是最大值所在位置，则需要交换彼此的位置
 			if maxPos ~= headNodePos then
 
-				swap(arr, headNodePos, maxPos)
+				table.swap(arr, headNodePos, maxPos)
 			
 				-- 继续比较建堆
 				buildMaxHeap(arr, maxPos, size)
@@ -330,7 +264,7 @@ function heapSort(data)
 			-- 假如当前的头节点不是最大值所在位置，则需要交换彼此的位置
 			if minPos ~= headNodePos then
 
-				swap(arr, headNodePos, minPos)
+				table.swap(arr, headNodePos, minPos)
 			
 				-- 继续比较建堆
 				buildMinHeap(arr, minPos, size)
@@ -358,7 +292,7 @@ function heapSort(data)
 	for i = table.nums(data), 2, -1 do
 		
 		-- 每次都将建好的堆的根节点(最大值)与堆的最后一个元素进行交换，再继续建堆，再交换。。。
-		swap(data, 1, i)
+		table.swap(data, 1, i)
 
 		buildMaxHeap(data, 1, i)
 		-- buildMinHeap(data, 1, i)

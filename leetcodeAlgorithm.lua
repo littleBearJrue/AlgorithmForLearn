@@ -1,49 +1,11 @@
 -- @Author: Jrue
 -- @Date:   2019-07-17 23:15:05
 -- @Last Modified by   Jrue
--- @Last Modified time 2019-08-12 16:10:23
+-- @Last Modified time 2019-08-14 16:11:45
 
 require "bit"
 local SortUtil = require(".sortingAlgorithm")
-
-function table.tostring(root)
-    if not root then return end
-    local cache = {  [root] = "root" }
-    local flag = {};
-    local function _dump(t,name)
-        local mt = getmetatable(t)
-        if mt and mt.__tostring then
-            return tostring(t)
-        end
-        local temp = {}
-        for i,v in ipairs(t) do
-            flag[i] = true;
-            if cache[v] then
-                table.insert(temp, cache[v])
-            elseif type(v) == "table" then
-                cache[v] = string.format("%s[%d]", name, i)
-                table.insert(temp, string.format("%s", _dump(v, cache[v])))
-            else
-                table.insert(temp, tostring(v))
-            end
-        end
-        for k,v in pairs(t) do
-            if not flag[k] then
-                local key = tostring(k)
-                if cache[v] then
-                    table.insert(temp, string.format("%s=%s", key, cache[v]))
-                elseif type(v) == "table" then
-                    cache[v] = string.format("%s.%s", name, key)
-                    table.insert(temp, string.format("%s=%s", key, _dump(v, cache[v])))
-                else
-                    table.insert(temp, string.format("%s=%s", key, tostring(v)))
-                end
-            end
-        end
-        return string.format("{%s}", table.concat(temp,","));
-    end
-    return _dump(root, "root");
-end
+local table = require(".tableUtils")
 
 
 --[[
@@ -279,12 +241,6 @@ end
 
 -------------------------------------- 数组相关算法 start----------------------------------------------------
 
-function swap(data, a, b)
-    data[a] = data[a] + data[b]
-    data[b] = data[a] - data[b]
-    data[a] = data[a] - data[b]
-end
-
 
 --[[
     寻找最小的k个数
@@ -309,7 +265,7 @@ function findLastestNumWithHeap(data, k)
             end
 
             if minPos ~= headNodePos then
-                swap(arr, headNodePos, minPos)
+                table.swap(arr, headNodePos, minPos)
 
                 buildMinHeap(arr, minPos, size)
             end
@@ -338,7 +294,7 @@ function findLastestNumWithHeap(data, k)
             -- 假如当前的头节点不是最大值所在位置，则需要交换彼此的位置
             if maxPos ~= headNodePos then
 
-                swap(arr, headNodePos, maxPos)
+                table.swap(arr, headNodePos, maxPos)
             
                 -- 继续比较建堆
                 buildMaxHeap(arr, maxPos, size)
@@ -359,7 +315,7 @@ function findLastestNumWithHeap(data, k)
         print("data[i]: ", data[i])
         print("data[1]: ", data[1])
         if data[i] < data[1] then
-            swap(data, 1, i)
+            table.swap(data, 1, i)
         
             buildMaxHeap(data, 1, k)
         end
@@ -432,7 +388,7 @@ function oddEvenSort(data)
         elseif not isOddNum(data[endIndex]) then
             endIndex = endIndex - 1
         else
-            swap(data, endIndex, beginIndex)
+            table.swap(data, endIndex, beginIndex)
         end
     end
     return data
@@ -449,13 +405,13 @@ function arrayColorSort(data)
     local endIndex = #data
     while(currentIndex < endIndex) do
         if data[currentIndex] == 0 then
-            swap(data, currentIndex, beginIndex)
+            table.swap(data, currentIndex, beginIndex)
             currentIndex = currentIndex + 1
             beginIndex = beginIndex + 1
         elseif data[currentIndex] == 1 then
             currentIndex = currentIndex + 1
         elseif data[currentIndex] == 2 then
-            swap(data, currentIndex, endIndex)
+            table.swap(data, currentIndex, endIndex)
 
             endIndex = endIndex - 1
         end
@@ -537,7 +493,7 @@ end
 --]]
 function shuffle(data)
     for i = #data, 2, -1 do
-        swap(data, i, math.random(1, i - 1))
+        table.swap(data, i, math.random(1, i - 1))
     end
     return data
 end
@@ -633,10 +589,10 @@ function main()
     -- local resultData = findMaxSubArray({1, -2, 3, 10, -4, 7, 2, -5})
     -- local resultData = oddEvenSort({2, 7,11,15, 1, 8, 3, 6, 8, 63})
     -- local resultData = arrayColorSort({0, 1, 2, 1, 1, 2, 0, 2, 1, 0})
-    -- local resultData = shuffle({1, 2, 3, 4, 5, 6, 7, 8, 9})
+    local resultData = shuffle({1, 2, 3, 4, 5, 6, 7, 8, 9})
     -- local resultData = BinarySearch({2, 7,11,15, 1, 8, 3, 6, 8, 63}, 63)
     -- local resultData = findHalfOfAppearWithDel({1, 2, 3, 1, 4, 1,5, 1, 1, 1, 1, 5,1,1})
-    local resultData = findMaxAndMinMultipleArray({2,4,5,-8,9,3,1,0,5,6,-7})
+    -- local resultData = findMaxAndMinMultipleArray({2,4,5,-8,9,3,1,0,5,6,-7})
     print("输出结果：", table.tostring(resultData))
      -- print("输出结果：", resultData)
 

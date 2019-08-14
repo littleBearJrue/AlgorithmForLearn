@@ -1,16 +1,11 @@
 --[[--ldoc desc
-@module shuffleAlgorithm
-@author JrueZhu
+@module tableUtils
+@author Jrue
 
-Date   2019-07-17 15:20:38
+Date   2019-08-14 14:17:10
 Last Modified by   Jrue
-Last Modified time 2019-07-17 15:32:15
+Last Modified time 2019-08-14 16:10:39
 ]]
-
---[[
-	洗牌算法
---]]
-
 function table.tostring(root)
     if not root then return end
     local cache = {  [root] = "root" }
@@ -50,20 +45,47 @@ function table.tostring(root)
     return _dump(root, "root");
 end
 
-local originData = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20}
+local function checktable(value)
+    if type(value) ~= "table" then value = {} end
+    return value
+end
 
-function swap(data, a, b)
+function table.nums(t)
+    local temp = checktable(t)
+    local count = 0
+    for k, v in pairs(temp) do
+        count = count + 1
+    end
+    return count
+end
+
+function table.clone(object)
+    local lookup_table = {}
+    local function _copy(object)
+        if type(object) ~= "table" then
+            return object
+        elseif lookup_table[object] then
+            return lookup_table[object]
+        end
+        local new_table = {}
+        lookup_table[object] = new_table
+        for key, value in pairs(object) do
+            new_table[_copy(key)] = _copy(value)
+        end
+        return setmetatable(new_table, getmetatable(object))
+    end
+    return _copy(object)
+end
+
+function table.swap(data, a, b)
 	data[a] = data[a] + data[b]
 	data[b] = data[a] - data[b]
 	data[a] = data[a] - data[b]
 end
 
-function shuffle()
-	print("洗牌算法前的数据:", table.tostring(originData))
-	for i = #originData, 2, -1 do
-		swap(originData, i, math.random(1, i - 1))
-	end
-	print("洗牌算法后的数据:", table.tostring(originData))
-end
-
-shuffle()
+return {
+	tostring = table.tostring,
+	nums = table.nums,
+	clone = table.clone,
+	swap = table.swap,
+}
